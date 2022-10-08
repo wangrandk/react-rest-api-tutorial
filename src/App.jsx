@@ -1,35 +1,18 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 import Contact from "./Contact";
 
+const fetcher = () =>
+  fetch("https://jsonplaceholder.typicode.com/users").then((res) => res.json());
+
 function App() {
-  const [contacts, setContacts] = useState([]);
-  const [error, setError] = useState(null);
+  const { isLoading, error, data } = useQuery(["contacts"], fetcher);
 
-  useEffect(() => {
-    axios("https://jsonplaceholder.typicode.com/users")
-      .then((response) => {
-        setError(null);
-        setContacts(response.data);
-      })
-      .catch(setError);
-
-    /* Using Fetch
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((response) => {
-        setContacts(response);
-        setError(null);
-      })
-      .catch(setError);
-    */
-  }, []);
-
+  if (isLoading) return <p>Loading</p>;
   if (error) return <p>An error occurred</p>;
 
   return (
     <div className="App">
-      {contacts.map(({ id, name, email, company }) => (
+      {data.map(({ id, name, email, company }) => (
         <Contact
           key={id}
           name={name}
